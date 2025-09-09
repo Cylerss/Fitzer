@@ -255,6 +255,13 @@ function Calculator() {
   const bmi = computedBmi || 0;
 
   const handleCalculate = () => {
+    // Check if all required fields are entered
+    if (!age || !heightCm || !weightKg) {
+      alert('Please enter the required details');
+      setRecommended([]); // Clear recommendations when validation fails
+      return;
+    }
+
     const nextBmi = heightM > 0 && weightKg > 0 ? Number((weightKg / (heightM * heightM)).toFixed(1)) : 0;
     setComputedBmi(nextBmi);
     const summary = `Age: ${age || '-'}\nHeight: ${heightCm || '-'} cm\nWeight: ${weightKg || '-'} kg\nBMI: ${nextBmi || '-'}`;

@@ -8,8 +8,8 @@ export default function Login() {
   const { colors, isDarkMode } = useTheme();
   const themeColors = colors[isDarkMode ? 'dark' : 'light'];
 
-  const [name, setName] = React.useState('Alex Johnson');
-  const [username, setUsername] = React.useState('alexj');
+  const [name, setName] = React.useState('Code Busters');
+  const [username, setUsername] = React.useState('codebusters');
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
   const [isShrunk, setIsShrunk] = React.useState(false);
   const lastYRef = React.useRef(0);
