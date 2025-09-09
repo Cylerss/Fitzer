@@ -42,21 +42,26 @@ export default function AIAssistantPage() {
 
     try {
       setIsLoading(true);
-      const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      const systemPrompt = 'You are GigaChat, a helpful fitness assistant. Give concise, practical advice about workouts, diets, and BMI. If asked for medical advice, recommend consulting a professional.';
+      const historyText = messages
+        .map(m => `${m.sender === 'bot' ? 'Assistant' : 'User'}: ${m.text}`)
+        .join('\n');
+      const finalPrompt = `${systemPrompt}\n\n${historyText}\nUser: ${trimmed}`;
+
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            { role: 'system', content: 'You are GigaChat, a helpful fitness assistant. Give concise, practical advice about workouts, diets, and BMI. If asked for medical advice, recommend consulting a professional.' },
-            ...messages.map(m => ({ role: m.sender === 'bot' ? 'assistant' : 'user', content: m.text })),
-            { role: 'user', content: trimmed },
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: finalPrompt }]
+            }
           ],
-          temperature: 0.7,
-          max_tokens: 250,
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 250
+          }
         })
       });
 
@@ -66,7 +71,7 @@ export default function AIAssistantPage() {
       }
 
       const data = await resp.json();
-      const botText = data?.choices?.[0]?.message?.content?.trim() || "Sorry, I couldn't process your request.";
+      const botText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "Sorry, I couldn't process your request.";
       addMessage({ sender: 'bot', text: botText });
     } catch (e) {
       console.error(e);

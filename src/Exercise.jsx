@@ -108,7 +108,7 @@ function NavBar() {
             Trainers
           </motion.a>
           <motion.a 
-            href="#contact" 
+            href="#/login" 
             className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`}
             whileHover={{ 
               scale: 1.05,
@@ -207,7 +207,7 @@ function NavBar() {
               Trainers
             </motion.a>
             <motion.a
-              href="#contact"
+              href="#/login"
               onClick={() => setIsMobileOpen(false)}
               className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`}
               whileHover={{ y: -1 }}
@@ -226,11 +226,20 @@ function Calculator() {
   const themeColors = colors[isDarkMode ? 'dark' : 'light'];
 
   const [age, setAge] = React.useState(25);
-  const [heightCm, setHeightCm] = React.useState(170);
-  const [weightKg, setWeightKg] = React.useState(70);
+  const [heightCm, setHeightCm] = React.useState(() => {
+    try { return Number(JSON.parse(localStorage.getItem('fitzer.bmi') || '{}').heightCm) || 170; } catch { return 170; }
+  });
+  const [weightKg, setWeightKg] = React.useState(() => {
+    try { return Number(JSON.parse(localStorage.getItem('fitzer.bmi') || '{}').weightKg) || 70; } catch { return 70; }
+  });
 
   const heightM = heightCm > 0 ? heightCm / 100 : 0;
   const bmi = heightM > 0 ? Number((weightKg / (heightM * heightM)).toFixed(1)) : 0;
+
+  React.useEffect(() => {
+    const payload = { heightCm, weightKg, updatedAt: Date.now() };
+    localStorage.setItem('fitzer.bmi', JSON.stringify(payload));
+  }, [heightCm, weightKg]);
 
   const bmiCategory = (() => {
     if (!isFinite(bmi) || bmi === 0) return "";
@@ -336,6 +345,10 @@ function Calculator() {
       <div className={`mt-4 text-xs ${themeColors.textMuted}`}>
         BMI is calculated as weight / (height²). Age is collected for context only.
       </div>
+      {React.useEffect(() => {
+        const payload = { heightCm, weightKg, updatedAt: Date.now() };
+        localStorage.setItem('fitzer.bmi', JSON.stringify(payload));
+      }, [heightCm, weightKg])}
     </motion.div>
   );
 }

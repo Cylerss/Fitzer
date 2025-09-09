@@ -2,6 +2,8 @@ import React from 'react';
 import Home from './Home';
 import Exercise from './Exercise';
 import AIAssistantPage from './AIAssistantPage';
+import Login from './Login';
+import Profile from './Profile';
 import { ThemeProvider } from './ThemeContext';
 import './App.css';
 
@@ -10,7 +12,17 @@ function App() {
 
   return (
     <ThemeProvider>
-      {route === '/exercise' ? <Exercise /> : route === '/assistant' ? <AIAssistantPage /> : <Home />}
+      {route === '/exercise' ? (
+        <Exercise />
+      ) : route === '/assistant' ? (
+        <AIAssistantPage />
+      ) : route === '/login' ? (
+        <Login />
+      ) : route === '/profile' ? (
+        <Profile />
+      ) : (
+        <Home />
+      )}
     </ThemeProvider>
   );
 }
