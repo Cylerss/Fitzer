@@ -86,7 +86,7 @@ function NavBar() {
             Diet Plans
           </motion.a>
           <motion.a 
-            href="#assistant" 
+            href="#/assistant" 
             className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`}
             whileHover={{ 
               y: -2,

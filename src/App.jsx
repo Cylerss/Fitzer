@@ -1,6 +1,7 @@
 import React from 'react';
 import Home from './Home';
 import Exercise from './Exercise';
+import AIAssistantPage from './AIAssistantPage';
 import { ThemeProvider } from './ThemeContext';
 import './App.css';
 
@@ -9,7 +10,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      {route === '/exercise' ? <Exercise /> : <Home />}
+      {route === '/exercise' ? <Exercise /> : route === '/assistant' ? <AIAssistantPage /> : <Home />}
     </ThemeProvider>
   );
 }

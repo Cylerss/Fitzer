@@ -84,7 +84,7 @@ function NavBar() {
             Diet Plans
           </motion.a>
           <motion.a 
-            href="#assistant" 
+            href="#/assistant" 
             className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`}
             whileHover={{ 
               y: -2,
@@ -192,7 +192,7 @@ function NavBar() {
               Diet Plans
             </motion.a>
             <motion.a
-              href="#assistant"
+              href="#/assistant"
               onClick={() => setIsMobileOpen(false)}
               className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`}
               whileHover={{ y: -1 }}
@@ -272,7 +272,7 @@ function Hero() {
           </motion.a>
 
           <motion.a
-            href="#assistant"
+            href="#/assistant"
             className={`inline-flex items-center gap-2 rounded-2xl px-5 py-3 ${themeColors.cardBg} ring-1 ${themeColors.border} ${themeColors.text} hover:${themeColors.cardBgHover} transition`}
             whileHover={{ 
               scale: 1.05,
