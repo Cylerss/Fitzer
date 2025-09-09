@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from './ThemeContext';
-import { Dumbbell, Bot, Sun, Moon, Menu, X, Search } from 'lucide-react';
+import { Dumbbell, Bot, Sun, Moon, Menu, X, Search, User, LogIn } from 'lucide-react';
 
 export default function Diet() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
@@ -27,6 +27,9 @@ function NavBar() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const themeColors = colors[isDarkMode ? 'dark' : 'light'];
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+  const isLoggedIn = React.useMemo(() => {
+    try { const u = JSON.parse(localStorage.getItem('fitzer.user') || '{}'); return Boolean(u && u.username); } catch { return false; }
+  }, []);
 
   return (
     <header className={`sticky top-0 z-50 backdrop-blur ${themeColors.backdrop} border-b ${themeColors.border}`}>
@@ -65,6 +68,9 @@ function NavBar() {
               {isMobileOpen ? <X className={`h-5 w-5 ${themeColors.text}`} /> : <Menu className={`h-5 w-5 ${themeColors.text}`} />}
             </motion.button>
           </div>
+          <motion.a href={isLoggedIn ? "#/profile" : "#/login"} className={`hidden md:inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`} whileHover={{ scale: 1.05 }}>
+            {isLoggedIn ? <User className="h-4 w-4" /> : <LogIn className="h-4 w-4" />} {isLoggedIn ? 'Profile' : 'Login'}
+          </motion.a>
         </div>
       </div>
       {isMobileOpen && (

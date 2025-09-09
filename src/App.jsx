@@ -2,6 +2,7 @@ import React from 'react';
 import Home from './Home';
 import Exercise from './Exercise';
 import AIAssistantPage from './AIAssistantPage';
+import Redeem from './Redeem';
 import Diet from './Diet';
 import Login from './Login';
 import Profile from './Profile';
@@ -19,6 +20,8 @@ function App() {
         <AIAssistantPage />
       ) : route === '/diet' ? (
         <Diet />
+      ) : route === '/redeem' ? (
+        <Redeem />
       ) : route === '/login' ? (
         <Login />
       ) : route === '/profile' ? (

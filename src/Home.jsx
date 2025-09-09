@@ -1,7 +1,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Dumbbell, LogIn, Search, Apple, Bot, Sun, Moon, Menu, X } from "lucide-react";
+import { Dumbbell, LogIn, Search, Apple, Bot, Sun, Moon, Menu, X, User } from "lucide-react";
 import { useTheme } from "./ThemeContext";
 
 export default function Home() {
@@ -34,6 +34,9 @@ function NavBar() {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
   const [isShrunk, setIsShrunk] = React.useState(false);
   const lastYRef = React.useRef(0);
+  const isLoggedIn = React.useMemo(() => {
+    try { const u = JSON.parse(localStorage.getItem('fitzer.user') || '{}'); return Boolean(u && u.username); } catch { return false; }
+  }, []);
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -50,7 +53,7 @@ function NavBar() {
     <header className={`sticky top-0 z-50 backdrop-blur ${themeColors.backdrop} border-b ${themeColors.border}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between">
         <motion.a 
-          href="#home" 
+          href="#/" 
           className="flex items-center gap-3"
           animate={{ scale: isShrunk ? 0.9 : 1 }}
           whileHover={{ 
@@ -76,7 +79,7 @@ function NavBar() {
 
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <motion.a 
-            href="#home" 
+            href="#/" 
             className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`}
             whileHover={{ 
               y: -2,
@@ -131,7 +134,7 @@ function NavBar() {
             Trainers
           </motion.a>
           <motion.a 
-            href="#/profile" 
+            href={isLoggedIn ? "#/profile" : "#/login"}
             className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`}
             whileHover={{ 
               scale: 1.05,
@@ -140,7 +143,7 @@ function NavBar() {
             }}
             transition={{ duration: 0.2 }}
           >
-            <LogIn className="h-4 w-4" /> Profile
+            {isLoggedIn ? <User className="h-4 w-4" /> : <LogIn className="h-4 w-4" />} {isLoggedIn ? 'Profile' : 'Login'}
           </motion.a>
         </nav>
 
@@ -193,7 +196,7 @@ function NavBar() {
         <div className={`md:hidden border-t ${themeColors.border} ${themeColors.bg}`}>
           <div className="px-3 py-3 space-y-2">
             <motion.a
-              href="#home"
+              href="#/"
               onClick={() => setIsMobileOpen(false)}
               className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`}
               whileHover={{ y: -1 }}

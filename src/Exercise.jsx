@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Dumbbell, LogIn, Search, Sun, Moon, Menu, X } from "lucide-react";
+import { Dumbbell, LogIn, Search, Sun, Moon, Menu, X, User } from "lucide-react";
 import { useTheme } from "./ThemeContext";
 
 export default function Exercise() {
@@ -26,6 +26,9 @@ function NavBar() {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
   const [isShrunk, setIsShrunk] = React.useState(false);
   const lastYRef = React.useRef(0);
+  const isLoggedIn = React.useMemo(() => {
+    try { const u = JSON.parse(localStorage.getItem('fitzer.user') || '{}'); return Boolean(u && u.username); } catch { return false; }
+  }, []);
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -123,7 +126,7 @@ function NavBar() {
             Trainers
           </motion.a>
           <motion.a 
-            href="#/profile" 
+            href={isLoggedIn ? "#/profile" : "#/login"}
             className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`}
             whileHover={{ 
               scale: 1.05,
@@ -132,7 +135,7 @@ function NavBar() {
             }}
             transition={{ duration: 0.2 }}
           >
-            <LogIn className="h-4 w-4" /> Login
+            {isLoggedIn ? <User className="h-4 w-4" /> : <LogIn className="h-4 w-4" />} {isLoggedIn ? 'Profile' : 'Login'}
           </motion.a>
         </nav>
 

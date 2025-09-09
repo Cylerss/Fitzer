@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from './ThemeContext';
 import { motion as m } from 'framer-motion';
-import { Dumbbell, LogIn, Search, Sun, Moon, Menu, X } from 'lucide-react';
+import { Dumbbell, LogIn, Search, Sun, Moon, Menu, X, Flame, Gift, CheckCircle } from 'lucide-react';
 
 export default function Profile() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
@@ -10,6 +10,21 @@ export default function Profile() {
   const [isShrunk, setIsShrunk] = React.useState(false);
   const lastYRef = React.useRef(0);
   const [showMotivate, setShowMotivate] = React.useState(false);
+  const [streak, setStreak] = React.useState(() => {
+    try { return Number(localStorage.getItem('fitzer.streak') || '0'); } catch { return 0; }
+  });
+  const [points, setPoints] = React.useState(() => {
+    try { return Number(localStorage.getItem('fitzer.points') || '0'); } catch { return 0; }
+  });
+  const [checkedToday, setCheckedToday] = React.useState(() => {
+    try {
+      const last = localStorage.getItem('fitzer.lastCheckin');
+      if (!last) return false;
+      const lastDate = new Date(Number(last));
+      const now = new Date();
+      return lastDate.toDateString() === now.toDateString();
+    } catch { return false; }
+  });
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -40,8 +55,9 @@ export default function Profile() {
     }
   }, [user]);
 
-  const name = user.name || '';
-  const username = user.username ? `(@${user.username})` : '';
+  const name = (String(user.name || '').trim().toLowerCase() === 'alex johnson') ? 'Code Busters' : (user.name || '');
+  const rawUsername = String(user.username || '').trim();
+  const username = rawUsername && rawUsername.toLowerCase() !== 'alexj' ? `(@${rawUsername})` : '';
 
   const heightCm = Number(bmi.heightCm) || 0;
   const weightKg = Number(bmi.weightKg) || 0;
@@ -82,6 +98,38 @@ export default function Profile() {
       { label: 'Trainers', completed: 1, total: 6 },
     ];
   }, []);
+
+  const handleDailyCheckin = React.useCallback(() => {
+    if (checkedToday) return;
+    const now = new Date();
+    const lastTs = Number(localStorage.getItem('fitzer.lastCheckin') || '0');
+    const last = lastTs ? new Date(lastTs) : null;
+
+    let nextStreak = streak;
+    if (last) {
+      const diffDays = Math.floor((now.setHours(0,0,0,0) - new Date(last).setHours(0,0,0,0)) / 86400000);
+      if (diffDays === 1) nextStreak += 1; // consecutive day
+      else if (diffDays > 1) nextStreak = 1; // reset
+    } else {
+      nextStreak = 1; // first check-in
+    }
+
+    const nextPoints = points + 20;
+
+    setStreak(nextStreak);
+    setPoints(nextPoints);
+    setCheckedToday(true);
+    try {
+      localStorage.setItem('fitzer.streak', String(nextStreak));
+      localStorage.setItem('fitzer.points', String(nextPoints));
+      localStorage.setItem('fitzer.lastCheckin', String(Date.now()));
+    } catch {}
+
+    // brief farewell message
+    try {
+      alert('See you soon');
+    } catch {}
+  }, [checkedToday, streak, points]);
 
   return (
     <div className={`min-h-screen ${themeColors.bg} ${themeColors.text} ${themeColors.selection}`}>
@@ -157,6 +205,42 @@ export default function Profile() {
               <div className={`${themeColors.textSecondary} text-xs`}>Age</div>
               <div className="font-semibold">{age || '—'}</div>
             </div>
+          </div>
+        </motion.div>
+
+        <motion.div className={`mt-6 rounded-2xl p-6 ${themeColors.cardBg} ring-1 ${themeColors.border}`} whileHover={{ scale: 1.01 }}>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold flex items-center gap-2">
+              <Flame className="text-amber-500" /> {streak} Day Streak
+            </h3>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex items-center gap-1"><Gift className="w-4 h-4 text-yellow-600" /> <span className="font-semibold">{points}</span> pts</div>
+              <a href="#/redeem" className="inline-flex rounded-xl px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white ring-1 ring-yellow-400">Redeem</a>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-7 gap-2 text-center">
+            {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day, idx) => (
+              <div key={idx} className="flex flex-col items-center">
+                <span className={`text-xs ${themeColors.textSecondary}`}>{day}</span>
+                {idx <= new Date().getDay() - 1 ? (
+                  <CheckCircle className="text-emerald-500" />
+                ) : (
+                  <div className={`h-5 w-5 rounded-full ring-1 ${themeColors.border}`}></div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 flex items-center justify-between">
+            <button
+              onClick={handleDailyCheckin}
+              disabled={checkedToday}
+              className={`rounded-2xl px-4 py-2 text-sm ${themeColors.accentBg} ${themeColors.accent} ring-1 ${themeColors.accentRing} disabled:opacity-50`}
+            >
+              {checkedToday ? 'Checked In' : 'Check In Today'}
+            </button>
+            <div className={`text-xs ${themeColors.textSecondary}`}>{checkedToday ? 'See you soon' : 'Earn +20 points'}</div>
           </div>
         </motion.div>
 

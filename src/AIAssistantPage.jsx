@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Send, Dumbbell, LogIn, Search, Sun, Moon, Menu, X } from "lucide-react";
+import { Send, Dumbbell, LogIn, Search, Sun, Moon, Menu, X, User } from "lucide-react";
 import { useTheme } from "./ThemeContext";
 
 export default function AIAssistantPage() {
@@ -9,6 +9,9 @@ export default function AIAssistantPage() {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
   const [isShrunk, setIsShrunk] = React.useState(false);
   const lastYRef = React.useRef(0);
+  const isLoggedIn = React.useMemo(() => {
+    try { const u = JSON.parse(localStorage.getItem('fitzer.user') || '{}'); return Boolean(u && u.username); } catch { return false; }
+  }, []);
 
   React.useEffect(() => {
     const onScroll = () => {
@@ -122,8 +125,8 @@ export default function AIAssistantPage() {
             <motion.a href="#diet" className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`} whileHover={{ y: -2, textShadow: `0 0 10px ${themeColors.accentTextShadow}` }} transition={{ duration: 0.2 }}>Diet Plans</motion.a>
             <motion.a href="#/assistant" className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`} whileHover={{ y: -2, textShadow: `0 0 10px ${themeColors.accentTextShadow}` }} transition={{ duration: 0.2 }}>AI Assistant</motion.a>
             <motion.a href="#trainers" className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`} whileHover={{ y: -2, textShadow: `0 0 10px ${themeColors.accentTextShadow}` }} transition={{ duration: 0.2 }}>Trainers</motion.a>
-            <motion.a href="#contact" className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`} whileHover={{ scale: 1.05, backgroundColor: isDarkMode ? "rgba(16, 185, 129, 0.3)" : "rgba(251, 146, 60, 0.3)", boxShadow: `0 0 20px ${themeColors.accentShadowStrong}` }} transition={{ duration: 0.2 }}>
-              <LogIn className="h-4 w-4" /> Login
+            <motion.a href={isLoggedIn ? "#/profile" : "#/login"} className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`} whileHover={{ scale: 1.05, backgroundColor: isDarkMode ? "rgba(16, 185, 129, 0.3)" : "rgba(251, 146, 60, 0.3)", boxShadow: `0 0 20px ${themeColors.accentShadowStrong}` }} transition={{ duration: 0.2 }}>
+              {isLoggedIn ? <User className="h-4 w-4" /> : <LogIn className="h-4 w-4" />} {isLoggedIn ? 'Profile' : 'Login'}
             </motion.a>
           </nav>
 
