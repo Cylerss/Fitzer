@@ -1,22 +1,24 @@
-
 import React from "react";
 import { motion } from "framer-motion";
-import { Dumbbell, LogIn, Search, Apple, Bot, Sun, Moon, Menu, X } from "lucide-react";
+import { Dumbbell, LogIn, Search, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "./ThemeContext";
 
-export default function Home() {
+export default function Exercise() {
   const { colors, isDarkMode } = useTheme();
   const themeColors = colors[isDarkMode ? 'dark' : 'light'];
 
   return (
     <div className={`min-h-screen ${themeColors.bg} ${themeColors.text} ${themeColors.selection}`}>
       <NavBar />
-      <Hero />
-      <BMICalculator />
+
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-10 py-10">
+        <h1 className={`text-3xl font-bold ${themeColors.text} mb-2`}>Exercises</h1>
+        <p className={`${themeColors.textSecondary} mb-6`}>Enter your details to get your personalized score.</p>
+        <Calculator />
+      </section>
     </div>
   );
 }
-
 
 function NavBar() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
@@ -27,7 +29,7 @@ function NavBar() {
     <header className={`sticky top-0 z-50 backdrop-blur ${themeColors.backdrop} border-b ${themeColors.border}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between">
         <motion.a 
-          href="#home" 
+          href="#/" 
           className="flex items-center gap-3"
           whileHover={{ 
             scale: 1.05,
@@ -51,7 +53,7 @@ function NavBar() {
 
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <motion.a 
-            href="#home" 
+            href="#/" 
             className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`}
             whileHover={{ 
               y: -2,
@@ -120,7 +122,6 @@ function NavBar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* Theme Toggle Button */}
           <motion.button
             onClick={toggleTheme}
             className={`p-2 rounded-lg ${themeColors.cardBg} ring-1 ${themeColors.border}`}
@@ -138,7 +139,6 @@ function NavBar() {
             )}
           </motion.button>
 
-          {/* Mobile Controls */}
           <div className="md:hidden flex items-center gap-2">
             <motion.button 
               className={`p-2 rounded-lg ${themeColors.cardBg}`}
@@ -163,12 +163,11 @@ function NavBar() {
           </div>
         </div>
       </div>
-      {/* Mobile Menu Panel */}
       {isMobileOpen && (
         <div className={`md:hidden border-t ${themeColors.border} ${themeColors.bg}`}>
           <div className="px-3 py-3 space-y-2">
             <motion.a
-              href="#home"
+              href="#/"
               onClick={() => setIsMobileOpen(false)}
               className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`}
               whileHover={{ y: -1 }}
@@ -222,120 +221,7 @@ function NavBar() {
   );
 }
 
-/* ===== Hero ===== */
-function Hero() {
-  const { colors, isDarkMode } = useTheme();
-  const themeColors = colors[isDarkMode ? 'dark' : 'light'];
-
-  return (
-    <section id="home" className="relative min-h-[72vh] grid place-items-center overflow-hidden">
-      {/* Background image */}
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1571907480495-7d2fccd4f451?q=80&w=1800&auto=format&fit=crop')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "brightness(0.45)",
-        }}
-      />
-
-      <div className="relative z-10 max-w-4xl px-6 text-center">
-
-        <motion.h1
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className={`text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight ${themeColors.text}`}
-        >
-          Transform Your Body, <span className={themeColors.accent}>Transform Your Life.</span>
-        </motion.h1>
-
-        <p className={`mt-4 ${themeColors.textSecondary} max-w-2xl mx-auto`}>
-          Smart exercise plans, personalized diets, and an on-page AI coach. Your fitness journey—gamified and simple.
-        </p>
-
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <motion.a
-            href="#diet"
-            className={`inline-flex items-center gap-2 rounded-2xl px-5 py-3 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`}
-            whileHover={{ 
-              scale: 1.05,
-              backgroundColor: isDarkMode ? "rgba(16, 185, 129, 0.3)" : "rgba(251, 146, 60, 0.3)",
-              y: -2,
-              boxShadow: `0 0 25px ${themeColors.accentShadowStrong}`
-            }}
-            transition={{ duration: 0.2 }}
-          >
-            <Apple className="h-5 w-5" /> Get Your Plan
-          </motion.a>
-
-          <motion.a
-            href="#assistant"
-            className={`inline-flex items-center gap-2 rounded-2xl px-5 py-3 ${themeColors.cardBg} ring-1 ${themeColors.border} ${themeColors.text} hover:${themeColors.cardBgHover} transition`}
-            whileHover={{ 
-              scale: 1.05,
-              backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)",
-              y: -2,
-              boxShadow: `0 0 25px ${themeColors.accentShadow}`
-            }}
-            transition={{ duration: 0.2 }}
-          >
-            <Bot className="h-5 w-5" /> Start Training Today
-          </motion.a>
-        </div>
-
-        <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
-          <StatCard label="Workouts" value="650+" />
-          <StatCard label="Diet Plans" value="120+" />
-          <StatCard label="Active Users" value="25k" />
-          <StatCard label="Avg. Streak" value="18 days" />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ===== Small helper components used on Home page ===== */
-function Badge({ children }) {
-  const { colors, isDarkMode } = useTheme();
-  const themeColors = colors[isDarkMode ? 'dark' : 'light'];
-
-  return (
-    <span className={`inline-flex items-center gap-2 rounded-full ${themeColors.accentBg} px-3 py-1 text-xs font-medium ${themeColors.accent} ring-1 ${themeColors.accentRing}`}>
-      {children}
-    </span>
-  );
-}
-
-function StatCard({ label, value }) {
-  const { colors, isDarkMode } = useTheme();
-  const themeColors = colors[isDarkMode ? 'dark' : 'light'];
-
-  return (
-    <motion.div 
-      className={`rounded-2xl ${themeColors.cardBg} ring-1 ${themeColors.borderSecondary} p-4`}
-      whileHover={{ 
-        scale: 1.05,
-        backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.05)",
-        y: -4,
-        boxShadow: `0 0 20px ${themeColors.accentShadow}`
-      }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className={`text-2xl font-extrabold ${themeColors.text}`}>{value}</div>
-      <div className={`text-xs ${themeColors.textMuted}`}>{label}</div>
-    </motion.div>
-  );
-}
-
-/* ===== Quick preview area (wireframe blocks for modules you'll implement later) ===== */
-function QuickPreview() {}
-function Footer() {}
-
-/* ===== BMI Calculator ===== */
-function BMICalculator() {
+function Calculator() {
   const { colors, isDarkMode } = useTheme();
   const themeColors = colors[isDarkMode ? 'dark' : 'light'];
 
@@ -373,27 +259,85 @@ function BMICalculator() {
   }, [bmi, bmiCategory, isDarkMode]);
 
   return (
-    <section id="diet" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-10 py-10">
-      <h2 className={`text-2xl font-semibold ${themeColors.text} mb-4`}>Start your journey</h2>
-      <motion.div
-        className={`rounded-2xl p-6 ${themeColors.cardBg} ring-1 ${themeColors.border} text-center`}
-        whileHover={{
-          scale: 1.01,
-          backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : "rgba(0,0,0,0.03)",
-          boxShadow: `0 0 20px ${themeColors.accentShadow}`
-        }}
-        transition={{ duration: 0.2 }}
-      >
-        <p className={`${themeColors.textSecondary}`}>Enter a few details to get your personalized score.</p>
-        <motion.a
-          href="#/exercise"
-          className={`mt-4 inline-flex items-center gap-2 rounded-2xl px-5 py-3 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`}
-          whileHover={{ scale: 1.05, y: -2, boxShadow: `0 0 25px ${themeColors.accentShadowStrong}` }}
-          transition={{ duration: 0.2 }}
-        >
-          Get started
-        </motion.a>
-      </motion.div>
-    </section>
+    <motion.div
+      className={`rounded-2xl p-6 ${themeColors.cardBg} ring-1 ${themeColors.border}`}
+      whileHover={{
+        scale: 1.01,
+        backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : "rgba(0,0,0,0.03)",
+        boxShadow: `0 0 20px ${themeColors.accentShadow}`
+      }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={`block text-sm mb-1 ${themeColors.textSecondary}`}>Age</label>
+            <input
+              type="number"
+              min={1}
+              max={120}
+              value={age}
+              onChange={(e) => setAge(Number(e.target.value))}
+              className={`w-full rounded-lg px-3 py-2 outline-none ${themeColors.bg} ring-1 ${themeColors.border} ${themeColors.text}`}
+            />
+          </div>
+          <div>
+            <label className={`block text-sm mb-1 ${themeColors.textSecondary}`}>Height (cm)</label>
+            <input
+              type="number"
+              min={50}
+              max={260}
+              value={heightCm}
+              onChange={(e) => setHeightCm(Number(e.target.value))}
+              className={`w-full rounded-lg px-3 py-2 outline-none ${themeColors.bg} ring-1 ${themeColors.border} ${themeColors.text}`}
+            />
+          </div>
+          <div>
+            <label className={`block text-sm mb-1 ${themeColors.textSecondary}`}>Weight (kg)</label>
+            <input
+              type="number"
+              min={10}
+              max={400}
+              value={weightKg}
+              onChange={(e) => setWeightKg(Number(e.target.value))}
+              className={`w-full rounded-lg px-3 py-2 outline-none ${themeColors.bg} ring-1 ${themeColors.border} ${themeColors.text}`}
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-center">
+          <div className="relative" style={{ width: 160, height: 160 }}>
+            <svg width={160} height={160} viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r={chart.radius} stroke={chart.trackColor} strokeWidth="14" fill="none" />
+              <motion.circle
+                cx="80"
+                cy="80"
+                r={chart.radius}
+                stroke={chart.color}
+                strokeWidth="14"
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray={chart.circumference}
+                animate={{ strokeDashoffset: chart.dashOffset }}
+                initial={{ strokeDashoffset: chart.circumference }}
+                transition={{ duration: 0.6, ease: 'easeInOut' }}
+                style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+              />
+            </svg>
+            <div className="absolute inset-0 grid place-items-center text-center">
+              <div>
+                <div style={{ color: chart.labelColor }} className="text-3xl font-extrabold">{bmi || '—'}</div>
+                <div style={{ color: chart.subLabelColor }} className="text-xs mt-1">{bmi ? bmiCategory : 'Enter details'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={`mt-4 text-xs ${themeColors.textMuted}`}>
+        BMI is calculated as weight / (height²). Age is collected for context only.
+      </div>
+    </motion.div>
   );
 }
+
+
