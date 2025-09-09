@@ -11,6 +11,19 @@ export default function Login() {
   const [name, setName] = React.useState('Alex Johnson');
   const [username, setUsername] = React.useState('alexj');
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+  const [isShrunk, setIsShrunk] = React.useState(false);
+  const lastYRef = React.useRef(0);
+
+  React.useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      const goingDown = y > lastYRef.current;
+      setIsShrunk(goingDown && y > 10);
+      lastYRef.current = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const [error, setError] = React.useState('');
 
   const onSubmit = (e) => {
@@ -33,17 +46,19 @@ export default function Login() {
           <m.a 
             href="#/" 
             className="flex items-center gap-3"
+            animate={{ scale: isShrunk ? 0.9 : 1 }}
             whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)" }}
             transition={{ duration: 0.2 }}
           >
             <m.span 
               className="h-9 w-9 grid place-items-center rounded-2xl bg-emerald-400/10 ring-1 ring-emerald-400/30"
+              animate={{ scale: isShrunk ? 0.95 : 1 }}
               whileHover={{ backgroundColor: "rgba(16, 185, 129, 0.2)", ringColor: "rgba(16, 185, 129, 0.5)", boxShadow: "0 0 15px rgba(16, 185, 129, 0.6)" }}
               transition={{ duration: 0.2 }}
             >
               <Dumbbell className="h-5 w-5 text-emerald-300" />
             </m.span>
-            <span className={`font-black tracking-tight ${themeColors.text} text-lg`}>Fitzer</span>
+            <m.span animate={{ scale: isShrunk ? 0.95 : 1 }} className={`font-black tracking-tight ${themeColors.text} text-lg`}>Fitzer</m.span>
           </m.a>
 
           <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -56,8 +71,8 @@ export default function Login() {
             <m.a href="#/assistant" className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`} whileHover={{ y: -2 }}>
               AI Assistant
             </m.a>
-            <m.a href="#/login" className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`} whileHover={{ scale: 1.05 }}>
-              <LogIn className="h-4 w-4" /> Login
+            <m.a href="#/profile" className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`} whileHover={{ scale: 1.05 }}>
+              <LogIn className="h-4 w-4" /> Profile
             </m.a>
           </nav>
 
@@ -87,8 +102,8 @@ export default function Login() {
               <m.a href="#/assistant" onClick={() => setIsMobileOpen(false)} className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`} whileHover={{ y: -1 }}>
                 AI Assistant
               </m.a>
-              <m.a href="#/login" onClick={() => setIsMobileOpen(false)} className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`} whileHover={{ y: -1 }}>
-                Login
+              <m.a href="#/profile" onClick={() => setIsMobileOpen(false)} className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`} whileHover={{ y: -1 }}>
+                Profile
               </m.a>
             </div>
           </div>
@@ -132,6 +147,16 @@ export default function Login() {
           </div>
         </motion.form>
       </section>
+      <a href="#/assistant" className="fixed bottom-6 right-6 z-50">
+        <m.button
+          className={`h-12 w-12 rounded-full ${themeColors.cardBg} ring-1 ${themeColors.border}`}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          aria-label="Open AI Assistant"
+        >
+          <Dumbbell className={`h-6 w-6 mx-auto ${themeColors.accent}`} />
+        </m.button>
+      </a>
     </div>
   );
 }

@@ -13,6 +13,16 @@ export default function Home() {
       <NavBar />
       <Hero />
       <BMICalculator />
+      <a href="#/assistant" className="fixed bottom-6 right-6 z-50">
+        <motion.button
+          className={`h-12 w-12 rounded-full ${themeColors.cardBg} ring-1 ${themeColors.border}`}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          aria-label="Open AI Assistant"
+        >
+          <Bot className={`h-6 w-6 mx-auto ${themeColors.accent}`} />
+        </motion.button>
+      </a>
     </div>
   );
 }
@@ -22,6 +32,19 @@ function NavBar() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const themeColors = colors[isDarkMode ? 'dark' : 'light'];
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+  const [isShrunk, setIsShrunk] = React.useState(false);
+  const lastYRef = React.useRef(0);
+
+  React.useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      const goingDown = y > lastYRef.current;
+      setIsShrunk(goingDown && y > 10);
+      lastYRef.current = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <header className={`sticky top-0 z-50 backdrop-blur ${themeColors.backdrop} border-b ${themeColors.border}`}>
@@ -29,6 +52,7 @@ function NavBar() {
         <motion.a 
           href="#home" 
           className="flex items-center gap-3"
+          animate={{ scale: isShrunk ? 0.9 : 1 }}
           whileHover={{ 
             scale: 1.05,
             boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)"
@@ -37,6 +61,7 @@ function NavBar() {
         >
           <motion.span 
             className="h-9 w-9 grid place-items-center rounded-2xl bg-emerald-400/10 ring-1 ring-emerald-400/30"
+            animate={{ scale: isShrunk ? 0.95 : 1 }}
             whileHover={{ 
               backgroundColor: "rgba(16, 185, 129, 0.2)",
               ringColor: "rgba(16, 185, 129, 0.5)",
@@ -46,7 +71,7 @@ function NavBar() {
           >
             <Dumbbell className="h-5 w-5 text-emerald-300" />
           </motion.span>
-          <span className={`font-black tracking-tight ${themeColors.text} text-lg`}>Fitzer</span>
+          <motion.span animate={{ scale: isShrunk ? 0.95 : 1 }} className={`font-black tracking-tight ${themeColors.text} text-lg`}>Fitzer</motion.span>
         </motion.a>
 
         <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -73,7 +98,7 @@ function NavBar() {
             Exercises
           </motion.a>
           <motion.a 
-            href="#diet" 
+            href="#/diet" 
             className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`}
             whileHover={{ 
               y: -2,
@@ -106,7 +131,7 @@ function NavBar() {
             Trainers
           </motion.a>
           <motion.a 
-            href="#/login" 
+            href="#/profile" 
             className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`}
             whileHover={{ 
               scale: 1.05,
@@ -115,7 +140,7 @@ function NavBar() {
             }}
             transition={{ duration: 0.2 }}
           >
-            <LogIn className="h-4 w-4" /> Login
+            <LogIn className="h-4 w-4" /> Profile
           </motion.a>
         </nav>
 
@@ -184,7 +209,7 @@ function NavBar() {
               Exercises
             </motion.a>
             <motion.a
-              href="#diet"
+              href="#/diet"
               onClick={() => setIsMobileOpen(false)}
               className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`}
               whileHover={{ y: -1 }}
@@ -208,12 +233,12 @@ function NavBar() {
               Trainers
             </motion.a>
             <motion.a
-              href="#/login"
+              href="#/profile"
               onClick={() => setIsMobileOpen(false)}
               className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`}
               whileHover={{ y: -1 }}
             >
-              Login
+              Profile
             </motion.a>
           </div>
         </div>
@@ -258,7 +283,7 @@ function Hero() {
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <motion.a
-            href="#diet"
+            href="#/diet"
             className={`inline-flex items-center gap-2 rounded-2xl px-5 py-3 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`}
             whileHover={{ 
               scale: 1.05,

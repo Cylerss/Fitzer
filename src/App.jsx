@@ -2,6 +2,7 @@ import React from 'react';
 import Home from './Home';
 import Exercise from './Exercise';
 import AIAssistantPage from './AIAssistantPage';
+import Diet from './Diet';
 import Login from './Login';
 import Profile from './Profile';
 import { ThemeProvider } from './ThemeContext';
@@ -16,6 +17,8 @@ function App() {
         <Exercise />
       ) : route === '/assistant' ? (
         <AIAssistantPage />
+      ) : route === '/diet' ? (
+        <Diet />
       ) : route === '/login' ? (
         <Login />
       ) : route === '/profile' ? (

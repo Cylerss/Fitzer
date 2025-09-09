@@ -7,6 +7,19 @@ export default function AIAssistantPage() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const themeColors = colors[isDarkMode ? 'dark' : 'light'];
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+  const [isShrunk, setIsShrunk] = React.useState(false);
+  const lastYRef = React.useRef(0);
+
+  React.useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      const goingDown = y > lastYRef.current;
+      setIsShrunk(goingDown && y > 10);
+      lastYRef.current = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const [messages, setMessages] = React.useState([
     {
@@ -88,17 +101,19 @@ export default function AIAssistantPage() {
           <motion.a 
             href="#/" 
             className="flex items-center gap-3"
+            animate={{ scale: isShrunk ? 0.9 : 1 }}
             whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)" }}
             transition={{ duration: 0.2 }}
           >
             <motion.span 
               className="h-9 w-9 grid place-items-center rounded-2xl bg-emerald-400/10 ring-1 ring-emerald-400/30"
+              animate={{ scale: isShrunk ? 0.95 : 1 }}
               whileHover={{ backgroundColor: "rgba(16, 185, 129, 0.2)", ringColor: "rgba(16, 185, 129, 0.5)", boxShadow: "0 0 15px rgba(16, 185, 129, 0.6)" }}
               transition={{ duration: 0.2 }}
             >
               <Dumbbell className="h-5 w-5 text-emerald-300" />
             </motion.span>
-            <span className={`font-black tracking-tight ${themeColors.text} text-lg`}>Fitzer</span>
+            <motion.span animate={{ scale: isShrunk ? 0.95 : 1 }} className={`font-black tracking-tight ${themeColors.text} text-lg`}>Fitzer</motion.span>
           </motion.a>
 
           <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -179,6 +194,38 @@ export default function AIAssistantPage() {
               <p className={`p-3 rounded-lg text-sm leading-relaxed shadow-md ${msg.sender === 'bot' ? 'italic tracking-wide ' + themeColors.cardBg + ' ring-1 ' + themeColors.border : themeColors.accentBg + ' ring-1 ' + themeColors.accentRing}`}>{msg.text}</p>
             </motion.div>
           ))}
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.25 }}
+              className={`flex items-start gap-3`}
+            >
+              <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="Robot Icon" className="w-8 h-8" />
+              <div className={`p-3 rounded-lg text-sm leading-relaxed shadow-md ${themeColors.cardBg} ring-1 ${themeColors.border}`} aria-live="polite" aria-label="Assistant is typing">
+                <div className="flex items-center gap-1 text-gray-400">
+                  <motion.span
+                    className="inline-block w-2 h-2 rounded-full"
+                    style={{ backgroundColor: isDarkMode ? '#9ca3af' : '#9ca3af' }}
+                    animate={{ opacity: [0.2, 1, 0.2] }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
+                  />
+                  <motion.span
+                    className="inline-block w-2 h-2 rounded-full"
+                    style={{ backgroundColor: isDarkMode ? '#9ca3af' : '#9ca3af' }}
+                    animate={{ opacity: [0.2, 1, 0.2] }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+                  />
+                  <motion.span
+                    className="inline-block w-2 h-2 rounded-full"
+                    style={{ backgroundColor: isDarkMode ? '#9ca3af' : '#9ca3af' }}
+                    animate={{ opacity: [0.2, 1, 0.2] }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
           <div ref={chatEndRef} />
         </div>
 
@@ -204,6 +251,16 @@ export default function AIAssistantPage() {
         </div>
         </motion.div>
       </div>
+      <a href="#/assistant" className="fixed bottom-6 right-6 z-50">
+        <motion.button
+          className={`h-12 w-12 rounded-full ${themeColors.cardBg} ring-1 ${themeColors.border}`}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          aria-label="Open AI Assistant"
+        >
+          <Dumbbell className={`h-6 w-6 mx-auto ${themeColors.accent}`} />
+        </motion.button>
+      </a>
     </div>
   );
 }

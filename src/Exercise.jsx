@@ -24,6 +24,19 @@ function NavBar() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const themeColors = colors[isDarkMode ? 'dark' : 'light'];
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+  const [isShrunk, setIsShrunk] = React.useState(false);
+  const lastYRef = React.useRef(0);
+
+  React.useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      const goingDown = y > lastYRef.current;
+      setIsShrunk(goingDown && y > 10);
+      lastYRef.current = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <header className={`sticky top-0 z-50 backdrop-blur ${themeColors.backdrop} border-b ${themeColors.border}`}>
@@ -31,6 +44,7 @@ function NavBar() {
         <motion.a 
           href="#/" 
           className="flex items-center gap-3"
+          animate={{ scale: isShrunk ? 0.9 : 1 }}
           whileHover={{ 
             scale: 1.05,
             boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)"
@@ -39,6 +53,7 @@ function NavBar() {
         >
           <motion.span 
             className="h-9 w-9 grid place-items-center rounded-2xl bg-emerald-400/10 ring-1 ring-emerald-400/30"
+            animate={{ scale: isShrunk ? 0.95 : 1 }}
             whileHover={{ 
               backgroundColor: "rgba(16, 185, 129, 0.2)",
               ringColor: "rgba(16, 185, 129, 0.5)",
@@ -48,7 +63,7 @@ function NavBar() {
           >
             <Dumbbell className="h-5 w-5 text-emerald-300" />
           </motion.span>
-          <span className={`font-black tracking-tight ${themeColors.text} text-lg`}>Fitzer</span>
+          <motion.span animate={{ scale: isShrunk ? 0.95 : 1 }} className={`font-black tracking-tight ${themeColors.text} text-lg`}>Fitzer</motion.span>
         </motion.a>
 
         <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -75,7 +90,7 @@ function NavBar() {
             Exercises
           </motion.a>
           <motion.a 
-            href="#diet" 
+            href="#/diet" 
             className={`${themeColors.textSecondary} hover:${themeColors.text.replace('text-', 'text-')} transition-colors`}
             whileHover={{ 
               y: -2,
@@ -108,7 +123,7 @@ function NavBar() {
             Trainers
           </motion.a>
           <motion.a 
-            href="#/login" 
+            href="#/profile" 
             className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent} ${themeColors.accentHover} transition`}
             whileHover={{ 
               scale: 1.05,
@@ -183,7 +198,7 @@ function NavBar() {
               Exercises
             </motion.a>
             <motion.a
-              href="#diet"
+              href="#/diet"
               onClick={() => setIsMobileOpen(false)}
               className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`}
               whileHover={{ y: -1 }}
@@ -207,12 +222,12 @@ function NavBar() {
               Trainers
             </motion.a>
             <motion.a
-              href="#/login"
+              href="#/profile"
               onClick={() => setIsMobileOpen(false)}
               className={`block rounded-lg px-4 py-3 ring-1 ${themeColors.border} ${themeColors.cardBg} hover:${themeColors.cardBgHover} ${themeColors.text}`}
               whileHover={{ y: -1 }}
             >
-              Login
+              Profile
             </motion.a>
           </div>
         </div>
@@ -232,14 +247,47 @@ function Calculator() {
   const [weightKg, setWeightKg] = React.useState(() => {
     try { return Number(JSON.parse(localStorage.getItem('fitzer.bmi') || '{}').weightKg) || 70; } catch { return 70; }
   });
+  const [lastResult, setLastResult] = React.useState(null);
+  const [recommended, setRecommended] = React.useState([]);
+  const [computedBmi, setComputedBmi] = React.useState(0);
 
   const heightM = heightCm > 0 ? heightCm / 100 : 0;
-  const bmi = heightM > 0 ? Number((weightKg / (heightM * heightM)).toFixed(1)) : 0;
+  const bmi = computedBmi || 0;
 
-  React.useEffect(() => {
-    const payload = { heightCm, weightKg, updatedAt: Date.now() };
+  const handleCalculate = () => {
+    const nextBmi = heightM > 0 && weightKg > 0 ? Number((weightKg / (heightM * heightM)).toFixed(1)) : 0;
+    setComputedBmi(nextBmi);
+    const summary = `Age: ${age || '-'}\nHeight: ${heightCm || '-'} cm\nWeight: ${weightKg || '-'} kg\nBMI: ${nextBmi || '-'}`;
+    setLastResult({ age, heightCm, weightKg, bmi: nextBmi });
+    // persist only on calculate
+    const payload = { heightCm, weightKg, age, bmi: nextBmi, updatedAt: Date.now() };
     localStorage.setItem('fitzer.bmi', JSON.stringify(payload));
-  }, [heightCm, weightKg]);
+    try {
+      const key = 'fitzer.weightHistory';
+      const prev = JSON.parse(localStorage.getItem(key) || '[]');
+      const next = Array.isArray(prev) ? prev : [];
+      next.push({ t: Date.now(), weightKg });
+      localStorage.setItem(key, JSON.stringify(next.slice(-24)));
+    } catch {}
+    // Build a randomized recommendation list
+    const LIBRARY = [
+      { id: 'push-ups', name: 'Push Ups', bodyPart: 'chest', target: 'pectorals' },
+      { id: 'squats', name: 'Bodyweight Squats', bodyPart: 'legs', target: 'quads' },
+      { id: 'plank', name: 'Plank', bodyPart: 'core', target: 'abdominals' },
+      { id: 'lunges', name: 'Lunges', bodyPart: 'legs', target: 'glutes' },
+      { id: 'burpees', name: 'Burpees', bodyPart: 'full body', target: 'conditioning' },
+      { id: 'rows', name: 'Inverted Rows', bodyPart: 'back', target: 'lats' },
+      { id: 'mountain-climbers', name: 'Mountain Climbers', bodyPart: 'core', target: 'abs/hip flexors' },
+      { id: 'dips', name: 'Bench Dips', bodyPart: 'arms', target: 'triceps' },
+      { id: 'jumping-jacks', name: 'Jumping Jacks', bodyPart: 'full body', target: 'cardio' },
+      { id: 'bicycle-crunch', name: 'Bicycle Crunch', bodyPart: 'core', target: 'obliques' },
+    ];
+    const shuffled = [...LIBRARY].sort(() => Math.random() - 0.5).slice(0, 6);
+    setRecommended(shuffled);
+    setAge("");
+    setHeightCm("");
+    setWeightKg("");
+  };
 
   const bmiCategory = (() => {
     if (!isFinite(bmi) || bmi === 0) return "";
@@ -268,6 +316,7 @@ function Calculator() {
   }, [bmi, bmiCategory, isDarkMode]);
 
   return (
+    <>
     <motion.div
       className={`rounded-2xl p-6 ${themeColors.cardBg} ring-1 ${themeColors.border}`}
       whileHover={{
@@ -287,6 +336,7 @@ function Calculator() {
               max={120}
               value={age}
               onChange={(e) => setAge(Number(e.target.value))}
+              placeholder="age"
               className={`w-full rounded-lg px-3 py-2 outline-none ${themeColors.bg} ring-1 ${themeColors.border} ${themeColors.text}`}
             />
           </div>
@@ -298,6 +348,7 @@ function Calculator() {
               max={260}
               value={heightCm}
               onChange={(e) => setHeightCm(Number(e.target.value))}
+              placeholder="height"
               className={`w-full rounded-lg px-3 py-2 outline-none ${themeColors.bg} ring-1 ${themeColors.border} ${themeColors.text}`}
             />
           </div>
@@ -309,6 +360,7 @@ function Calculator() {
               max={400}
               value={weightKg}
               onChange={(e) => setWeightKg(Number(e.target.value))}
+              placeholder="weight"
               className={`w-full rounded-lg px-3 py-2 outline-none ${themeColors.bg} ring-1 ${themeColors.border} ${themeColors.text}`}
             />
           </div>
@@ -342,14 +394,59 @@ function Calculator() {
         </div>
       </div>
 
-      <div className={`mt-4 text-xs ${themeColors.textMuted}`}>
-        BMI is calculated as weight / (height²). Age is collected for context only.
-      </div>
-      {React.useEffect(() => {
-        const payload = { heightCm, weightKg, updatedAt: Date.now() };
-        localStorage.setItem('fitzer.bmi', JSON.stringify(payload));
-      }, [heightCm, weightKg])}
+      {lastResult && (
+        <div className={`mt-4 text-sm ${themeColors.text}`}>
+          <div className="font-semibold">Last Result</div>
+          <div className={`${themeColors.textSecondary}`}>
+            Height: <span className="font-medium">{lastResult.heightCm || '—'} cm</span>,
+            {' '}Weight: <span className="font-medium">{lastResult.weightKg || '—'} kg</span>,
+            {' '}BMI: <span className="font-medium">{lastResult.bmi || '—'}</span>
+          </div>
+        </div>
+      )}
+      <motion.button
+        onClick={handleCalculate}
+        className={`mt-3 inline-flex items-center gap-2 rounded-2xl px-4 py-2 ${themeColors.accentBg} ring-1 ${themeColors.accentRing} ${themeColors.accent}`}
+        whileHover={{ scale: 1.03 }}
+      >
+        Calculate BMI
+      </motion.button>
     </motion.div>
+    {recommended.length > 0 && (
+      <section className="mt-8">
+        <h2 className={`text-2xl font-bold ${themeColors.text} mb-4`}>Recommended Exercises</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {recommended.map((ex) => (
+            <motion.div
+              key={ex.id}
+              className={`rounded-2xl p-4 ${themeColors.cardBg} ring-1 ${themeColors.border} hover:${themeColors.cardBgHover}`}
+              whileHover={{ y: -3, scale: 1.01, boxShadow: `0 0 20px ${themeColors.accentShadow}` }}
+              transition={{ duration: 0.15 }}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-lg font-semibold">{ex.name}</div>
+                  <div className={`text-xs mt-1 ${themeColors.textSecondary}`}>{ex.bodyPart} • {ex.target}</div>
+                </div>
+                <div className="h-10 w-10 grid place-items-center rounded-xl bg-emerald-400/15 ring-1 ring-emerald-400/30">🏋️</div>
+              </div>
+              <div className={`mt-3 text-xs ${themeColors.textMuted}`}>3 sets • 8-12 reps • Rest 60s</div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+    )}
+    <a href="#/assistant" className="fixed bottom-6 right-6 z-50">
+      <motion.button
+        className={`h-12 w-12 rounded-full ${themeColors.cardBg} ring-1 ${themeColors.border}`}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.95 }}
+        aria-label="Open AI Assistant"
+      >
+        <Dumbbell className={`h-6 w-6 mx-auto ${themeColors.accent}`} />
+      </motion.button>
+    </a>
+    </>
   );
 }
 
